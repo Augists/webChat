@@ -11,6 +11,7 @@ type userID int64
 var (
 	DBdriver = "mysql"
 	DBinfo   = "root:password@/chatServer?charset=utf8"
+	DBengine *xorm.Engine
 )
 
 type User struct {
@@ -36,56 +37,70 @@ type Group struct {
 	count     int
 }
 
-func initDB() *xorm.Engine {
-	engine, err := xorm.NewEngine(DBdriver, DBinfo)
+type LoginContent struct {
+	UserID   userID
+	Password string
+}
+
+func InitDB() {
+	DBengine, err := xorm.NewEngine(DBdriver, DBinfo)
 	// xorm.NewEngine("postgres", "user=postgres password=123 dbname=test sslmode=disable")
 	// xorm.NewEngine("sqlite3", "./test.db")
 	// xorm.NewEngine("mssql", "sqlserver://sa:123@localhost:1433?database=test")
 	if err != nil {
 		panic(err)
 	} else {
-		err = engine.Sync2(new(User), new(Message), new(Group))
-		if err != nil {
-			panic(err)
-		} else {
-			return engine
-		}
+		// DBengine.ShowSQL(true)
+
+		// check if table exists, will create it if not
+		DBengine.Sync2(new(User), new(Message), new(Group))
+		// err = DBengine.Sync2(new(User), new(Message), new(Group))
+		// if err != nil {
+		// 	panic(err)
+		// }
 	}
 }
 
-func (s *Group) setAdmin(e *xorm.Engine, id userID) error {
-	if has, _ := e.Exist(&Group{
+func (s *Group) SetAdmin(id userID) error {
+	if has, _ := DBengine.Exist(&Group{
 		groupID:  s.groupID,
 		userList: []userID{id},
 	}); has {
 		s.adminList = append(s.adminList, id)
 		RemoveSlice(s.userList, id)
-		e.Update(&Group{}, s)
+		DBengine.Update(&Group{}, s)
 		// e.Table(&Group{}).Update(s)
 	}
 	return nil
 }
 
-func RemoveSlice(slice []userID, i userID) []userID {
-	for j, v := range slice {
-		if v == i {
-			slice = append(slice[:j], slice[j+1:]...)
-			break
-		}
-	}
-	return slice
-}
-
-func (u *User) Add(e *xorm.Engine) error {
+func (u *User) Add() error {
 	u.Salt = GetRandomString(10)
 	u.Password = GetMD5(u.Password + u.Salt)
-	_, err := e.Insert(u)
+	_, err := DBengine.Insert(u)
 	return err
 }
 
-func (u *User) setPassword(e *xorm.Engine, pwd string) error {
+func (u *User) SetPassword(pwd string) error {
 	u.Salt = GetRandomString(10)
 	u.Password = GetMD5(pwd + u.Salt)
-	_, err := e.Update(u)
+	_, err := DBengine.Update(u)
 	return err
+}
+
+// 2 - false, err - user not found
+// 1 - false, nil - password not match
+// 0 - true, nil  - login success
+func (e *LoginContent) UserLogin() (bool, error) {
+	var user User
+	has, err := DBengine.Where("name = ?", e.UserID).Get(&user)
+	if err != nil {
+		return false, err
+	}
+	if has {
+		if user.Password == GetMD5(e.Password+user.Salt) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
