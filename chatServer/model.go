@@ -42,6 +42,10 @@ type LoginContent struct {
 	Password string
 }
 
+type LogoutContent struct {
+	UserID userID
+}
+
 func InitDB() {
 	DBengine, err := xorm.NewEngine(DBdriver, DBinfo)
 	// xorm.NewEngine("postgres", "user=postgres password=123 dbname=test sslmode=disable")

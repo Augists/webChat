@@ -40,7 +40,7 @@ func handleMessage(conn net.Conn, buf []byte) {
 	case LOGIN:
 		handleLogin(conn, msg.Content)
 	case LOGOUT:
-		// handleLogout(conn, msg.Content)
+		handleLogout(conn, msg.Content)
 	case REGISTER:
 		// handleRegister(conn, msg.Content)
 	case CHATMESSAGE:
@@ -77,4 +77,24 @@ func handleLogin(conn net.Conn, content []byte) {
 	res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
 	resJSON, _ := json.Marshal(res)
 	conn.Write([]byte(resJSON))
+}
+
+func handleLogout(conn net.Conn, content []byte) {
+	msg := LogoutContent{}
+	json.Unmarshal(content, &msg)
+	if _, ok := userIP[msg.UserID]; ok {
+		delete(userIP, msg.UserID)
+		log.Println("userID: ", msg.UserID, "\tIP: ", userIP[msg.UserID])
+		statusCode := LOGOUT
+		resMsg := "Logout Success"
+		res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
+		resJSON, _ := json.Marshal(res)
+		conn.Write([]byte(resJSON))
+	} else {
+		statusCode := ERROR
+		resMsg := "User Not Found"
+		res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
+		resJSON, _ := json.Marshal(res)
+		conn.Write([]byte(resJSON))
+	}
 }
