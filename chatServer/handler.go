@@ -42,7 +42,7 @@ func handleMessage(conn net.Conn, buf []byte) {
 	case LOGOUT:
 		handleLogout(conn, msg.Content)
 	case REGISTER:
-		// handleRegister(conn, msg.Content)
+		handleRegister(conn, msg.Content)
 	case CHATMESSAGE:
 		// handleChatMessage(conn, msg.Content)
 	case GROUPMESSAGE:
@@ -51,16 +51,16 @@ func handleMessage(conn net.Conn, buf []byte) {
 }
 
 func handleLogin(conn net.Conn, content []byte) {
-	msg := LoginContent{}
+	msg := User{}
 
 	var resMsg string
 	var statusCode int
 
 	json.Unmarshal(content, &msg)
-	if ok, err := msg.UserLogin(); ok {
+	if ok, err := msg.Login(); ok {
 		// store userID and IP in map
-		userIP[msg.UserID] = conn.RemoteAddr().String()
-		log.Println("userID: ", msg.UserID, "\tIP: ", userIP[msg.UserID])
+		userIP[msg.ID] = conn.RemoteAddr().String()
+		log.Println("userID: ", msg.ID, "\tIP: ", userIP[msg.ID])
 
 		resMsg = "Login Success"
 		statusCode = LOGIN
@@ -74,27 +74,41 @@ func handleLogin(conn net.Conn, content []byte) {
 		log.Fatal(err)
 	}
 
-	res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
-	resJSON, _ := json.Marshal(res)
-	conn.Write([]byte(resJSON))
+	Response(conn, statusCode, resMsg)
 }
 
 func handleLogout(conn net.Conn, content []byte) {
-	msg := LogoutContent{}
+	msg := User{}
 	json.Unmarshal(content, &msg)
-	if _, ok := userIP[msg.UserID]; ok {
-		delete(userIP, msg.UserID)
-		log.Println("userID: ", msg.UserID, "\tIP: ", userIP[msg.UserID])
-		statusCode := LOGOUT
-		resMsg := "Logout Success"
-		res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
-		resJSON, _ := json.Marshal(res)
-		conn.Write([]byte(resJSON))
+	if _, ok := userIP[msg.ID]; ok {
+		delete(userIP, msg.ID)
+
+		log.Println("userID: ", msg.ID, "\tIP: ", userIP[msg.ID])
+		Response(conn, LOGOUT, "Logout Success")
+
+		// close connection
+		conn.Close()
 	} else {
-		statusCode := ERROR
-		resMsg := "User Not Found"
-		res := clientMessageAPI{Type: statusCode, Content: []byte(resMsg)}
-		resJSON, _ := json.Marshal(res)
-		conn.Write([]byte(resJSON))
+		Response(conn, ERROR, "User Not Found")
 	}
+}
+
+func handleRegister(conn net.Conn, content []byte) {
+	msg := User{}
+	json.Unmarshal(content, &msg)
+	if msg.CheckExist() {
+		Response(conn, ERROR, "User Already Exist")
+	} else {
+		if err := msg.Add(); err != nil {
+			Response(conn, ERROR, "Register Fail")
+		} else {
+			Response(conn, REGISTER, "Register Success")
+		}
+	}
+}
+
+func Response(conn net.Conn, statusCode int, content string) {
+	res := clientMessageAPI{Type: statusCode, Content: []byte(content)}
+	resJSON, _ := json.Marshal(res)
+	conn.Write([]byte(resJSON))
 }

@@ -37,15 +37,6 @@ type Group struct {
 	count     int
 }
 
-type LoginContent struct {
-	UserID   userID
-	Password string
-}
-
-type LogoutContent struct {
-	UserID userID
-}
-
 func InitDB() {
 	DBengine, err := xorm.NewEngine(DBdriver, DBinfo)
 	// xorm.NewEngine("postgres", "user=postgres password=123 dbname=test sslmode=disable")
@@ -78,6 +69,11 @@ func (s *Group) SetAdmin(id userID) error {
 	return nil
 }
 
+func (u *User) CheckExist() bool {
+	has, _ := DBengine.Exist(u)
+	return has
+}
+
 func (u *User) Add() error {
 	u.Salt = GetRandomString(10)
 	u.Password = GetMD5(u.Password + u.Salt)
@@ -95,9 +91,9 @@ func (u *User) SetPassword(pwd string) error {
 // 2 - false, err - user not found
 // 1 - false, nil - password not match
 // 0 - true, nil  - login success
-func (e *LoginContent) UserLogin() (bool, error) {
+func (e *User) Login() (bool, error) {
 	var user User
-	has, err := DBengine.Where("name = ?", e.UserID).Get(&user)
+	has, err := DBengine.Where("id = ?", e.ID).Get(&user)
 	if err != nil {
 		return false, err
 	}
