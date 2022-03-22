@@ -18,7 +18,7 @@ increment the number from zero
 ```go
 type clientMessageAPI struct {
 	Type    int    `json:"type"`
-	Content []byte `json:"content"`
+	Content []interface{} `json:"content"`
 }
 ```
 
@@ -27,7 +27,12 @@ Login example:
 ```json
 {
   "type": 0,
-  "content": "content string",
+  "content": [
+    {
+    },
+    {
+    }
+  ]
 }
 ```
 
@@ -76,11 +81,33 @@ Login example:
 ```json
 {
   "type": 0,
-  "content": "
-  {
+  "content": [{
     "id": 1234567890,
     "password": "123456"
-  }
-  "
+  }]
+}
+```
+
+Chat messages example:
+
+```json
+{
+  "type": 3,
+  "content": [
+    {
+      "SenderID": 1234567890,
+      "ReceiverID": 0987654321,
+      "Content": "Hello, my bro",
+      "Create": "",
+      "Modified": ""
+    },
+    {
+      "SenderID": 1234567890,
+      "ReceiverID": 0987654321,
+      "Content": "Nice to meet u",
+      "Create": "",
+      "Modified": ""
+    }
+  ]
 }
 ```
