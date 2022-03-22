@@ -5,20 +5,6 @@ import (
 	"net"
 )
 
-const (
-	LOGIN = iota
-	LOGOUT
-	REGISTER
-	CHATMESSAGE
-	GROUPMESSAGE
-	ERROR
-)
-
-type clientMessageAPI struct {
-	Type    int           `json:"type"`
-	Content []interface{} `json:"content"`
-}
-
 func main() {
 	go InitDB()
 

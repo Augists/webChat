@@ -115,3 +115,14 @@ Chat messages example:
   ]
 }
 ```
+
+Error response example:
+
+```json
+{
+  "type": 5,
+  "content": [
+    "error message"
+  ]
+}
+```

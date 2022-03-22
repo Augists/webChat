@@ -10,6 +10,20 @@ var (
 	userIP map[userID]string
 )
 
+const (
+	LOGIN = iota
+	LOGOUT
+	REGISTER
+	CHATMESSAGE
+	GROUPMESSAGE
+	ERROR
+)
+
+type clientMessageAPI struct {
+	Type    int           `json:"type"`
+	Content []interface{} `json:"content"`
+}
+
 func handleClient(conn net.Conn) {
 	var buf [1024]byte
 	for {
@@ -38,15 +52,15 @@ func handleMessage(conn net.Conn, buf []byte) {
 	}
 	switch msg.Type {
 	case LOGIN:
-		handleLogin(conn, msg.Content)
+		handleLogin(conn, msg.Content[0].([]byte))
 	case LOGOUT:
-		handleLogout(conn, msg.Content)
+		handleLogout(conn, msg.Content[0].([]byte))
 	case REGISTER:
-		handleRegister(conn, msg.Content)
+		handleRegister(conn, msg.Content[0].([]byte))
 	case CHATMESSAGE:
 		handleChatMessage(conn, msg.Content)
 	case GROUPMESSAGE:
-		// handleGroupMessage(conn, msg.Content)
+		handleGroupMessage(conn, msg.Content)
 	}
 }
 
@@ -107,18 +121,33 @@ func handleRegister(conn net.Conn, content []byte) {
 	}
 }
 
-func handleChatMessage(conn net.Conn, content []byte) {
-	msg := Message{}
-	json.Unmarshal(content, &msg)
-	if _, ok := userIP[msg.SenderID]; ok {
-		// msg.Store()
-	} else {
-		Response(conn, ERROR, "Sender Not Found")
+func handleChatMessage(conn net.Conn, content []interface{}) {
+	msg := []Message{}
+	for i, v := range content {
+		json.Unmarshal(v.([]byte), &msg[i])
+		if _, ok := userIP[msg[i].SenderID]; ok {
+			// msg[i].Store()
+		} else {
+			Response(conn, ERROR, "Sender Not Found")
+		}
+	}
+}
+
+func handleGroupMessage(conn net.Conn, content []interface{}) {
+	msg := []Message{}
+	for i, v := range content {
+		json.Unmarshal(v.([]byte), &msg[i])
+		if _, ok := userIP[msg[i].SenderID]; ok {
+			// msg[i].Store()
+		} else {
+			Response(conn, ERROR, "Sender Not Found")
+		}
 	}
 }
 
 func Response(conn net.Conn, statusCode int, content string) {
-	res := clientMessageAPI{Type: statusCode, Content: []byte(content)}
+	resContent := []interface{}{[]byte(content)}
+	res := clientMessageAPI{Type: statusCode, Content: resContent}
 	resJSON, _ := json.Marshal(res)
 	conn.Write([]byte(resJSON))
 }
