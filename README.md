@@ -10,3 +10,5 @@ A simple IM project deployed using web page. This project is a hands-on assignme
 Python Client & Golang Server
 
 C&S communicates by [socket](./SocketAPI.md)
+
+Dashboard on [project](https://github.com/Augists/webChat/projects/1?fullscreen=true)
