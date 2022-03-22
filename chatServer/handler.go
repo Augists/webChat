@@ -44,7 +44,7 @@ func handleMessage(conn net.Conn, buf []byte) {
 	case REGISTER:
 		handleRegister(conn, msg.Content)
 	case CHATMESSAGE:
-		// handleChatMessage(conn, msg.Content)
+		handleChatMessage(conn, msg.Content)
 	case GROUPMESSAGE:
 		// handleGroupMessage(conn, msg.Content)
 	}
@@ -104,6 +104,16 @@ func handleRegister(conn net.Conn, content []byte) {
 		} else {
 			Response(conn, REGISTER, "Register Success")
 		}
+	}
+}
+
+func handleChatMessage(conn net.Conn, content []byte) {
+	msg := Message{}
+	json.Unmarshal(content, &msg)
+	if _, ok := userIP[msg.SenderID]; ok {
+		// msg.Store()
+	} else {
+		Response(conn, ERROR, "Sender Not Found")
 	}
 }
 

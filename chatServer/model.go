@@ -7,6 +7,7 @@ import (
 )
 
 type userID int64
+type groupID int64
 
 var (
 	DBdriver = "mysql"
@@ -21,20 +22,28 @@ type User struct {
 	Password string `xorm:"varchar(200)"`
 }
 
-type Message struct {
-	fromUserID userID
-	toUserID   userID
-	Content    string
-	Created    time.Time
-	Modified   time.Time
-}
-
 type Group struct {
 	groupID   int64
 	leader    userID
 	adminList []userID
 	userList  []userID
 	count     int
+}
+
+type Message struct {
+	SenderID   userID
+	ReceiverID userID
+	Content    string
+	Created    time.Time
+	Modified   time.Time
+}
+
+type GroupMessage struct {
+	GroupID  groupID
+	UserID   userID
+	Content  string
+	Created  time.Time
+	Modified time.Time
 }
 
 func InitDB() {
