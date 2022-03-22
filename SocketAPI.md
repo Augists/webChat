@@ -1,5 +1,7 @@
 # webChat socket api
 
+C&S communicate by socket, with two-time jsonifying. To unmarshal the json string received from socket, golang will regard the `Content` part as an array of `interface{}` and assert type based on the value of the `Type` part.
+
 ## Status Code
 
 * LOGIN
@@ -9,7 +11,9 @@
 *	GROUPMESSAGE
 *	ERROR
 
-increment the number from zero
+Increment the number from zero
+
+Server will also respond with the same status code if success during `LOGIN`, `LOGOUT` and `REGISTR`, while it replies error message followed by `ERROR`.
 
 ## Socket Steam
 

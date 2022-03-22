@@ -15,8 +15,8 @@ const (
 )
 
 type clientMessageAPI struct {
-	Type    int    `json:"type"`
-	Content []byte `json:"content"`
+	Type    int           `json:"type"`
+	Content []interface{} `json:"content"`
 }
 
 func main() {
