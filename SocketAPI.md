@@ -95,15 +95,15 @@ Chat messages example:
   "type": 3,
   "content": [
     {
-      "SenderID": 1234567890,
-      "ReceiverID": 0987654321,
+      "SenderID": 123456789,
+      "ReceiverID": 987654321,
       "Content": "Hello, my bro",
       "Create": "",
       "Modified": ""
     },
     {
-      "SenderID": 1234567890,
-      "ReceiverID": 0987654321,
+      "SenderID": 123456789,
+      "ReceiverID": 987654321,
       "Content": "Nice to meet u",
       "Create": "",
       "Modified": ""
