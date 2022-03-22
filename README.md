@@ -4,7 +4,4 @@ A simple IM project deployed using web page. This project is a hands-on assignme
 
 Python Client & Golang Server
 
-## Contributors:
-
-* [Jty](https://github.com/Jty-123)
-* [Augists ZDCZ](https://github.com/Augists)
+C&S communicates by [socket](./SocketAPI.md)
