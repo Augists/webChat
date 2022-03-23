@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"log"
 	"time"
 	"xorm.io/xorm"
 )
@@ -11,7 +13,7 @@ type groupID int64
 
 var (
 	DBdriver = "mysql"
-	DBinfo   = "root:password@/chatServer?charset=utf8"
+	DBinfo   = "augists:password@/chatServer?charset=utf8"
 	DBengine *xorm.Engine
 )
 
@@ -23,8 +25,10 @@ type User struct {
 }
 
 type Group struct {
-	groupID   int64
-	leader    userID
+	groupID groupID
+	Name    string
+	leader  userID
+	// store list in mysql
 	adminList []userID
 	userList  []userID
 	count     int
@@ -54,10 +58,12 @@ func InitDB() {
 	if err != nil {
 		panic(err)
 	} else {
-		// DBengine.ShowSQL(true)
+		DBengine.ShowSQL(true)
 
 		// check if table exists, will create it if not
-		DBengine.Sync2(new(User), new(Message), new(Group))
+		// DBengine.Sync2(new(User), new(Message), new(Group))
+		log.Fatal(DBengine.Sync2(new(User), new(Message), new(Group)))
+		fmt.Println("Database initialized")
 		// err = DBengine.Sync2(new(User), new(Message), new(Group))
 		// if err != nil {
 		// 	panic(err)
@@ -97,9 +103,9 @@ func (u *User) SetPassword(pwd string) error {
 	return err
 }
 
-// 2 - false, err - user not found
-// 1 - false, nil - password not match
-// 0 - true, nil  - login success
+// false, err - user not found
+// false, nil - password not match
+// true, nil  - login success
 func (e *User) Login() (bool, error) {
 	var user User
 	has, err := DBengine.Where("id = ?", e.ID).Get(&user)
