@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net"
 )
 
 func GetRandomString(length int) string {
@@ -28,4 +30,11 @@ func RemoveSlice(slice []userID, i userID) []userID {
 		}
 	}
 	return slice
+}
+
+func Response(conn net.Conn, statusCode int, content string) {
+	resContent := []interface{}{[]byte(content)}
+	res := clientMessageAPI{Type: statusCode, Content: resContent}
+	resJSON, _ := json.Marshal(res)
+	conn.Write([]byte(resJSON))
 }

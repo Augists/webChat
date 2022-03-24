@@ -78,6 +78,10 @@ func handleLogin(conn net.Conn, content []byte) {
 
 		resMsg = "Login Success"
 		statusCode = LOGIN
+
+		// push messages to client if any
+		// TODO
+
 	} else if err != nil {
 		resMsg = "User Not Found"
 		statusCode = ERROR
@@ -127,6 +131,9 @@ func handleChatMessage(conn net.Conn, content []interface{}) {
 		json.Unmarshal(v.([]byte), &msg[i])
 		if _, ok := userIP[msg[i].SenderID]; ok {
 			// msg[i].Store()
+			// try to push message to client
+			// TODO
+
 		} else {
 			Response(conn, ERROR, "Sender Not Found")
 		}
@@ -139,15 +146,11 @@ func handleGroupMessage(conn net.Conn, content []interface{}) {
 		json.Unmarshal(v.([]byte), &msg[i])
 		if _, ok := userIP[msg[i].SenderID]; ok {
 			// msg[i].Store()
+			// try to push message to client
+			//TODO
+
 		} else {
 			Response(conn, ERROR, "Sender Not Found")
 		}
 	}
-}
-
-func Response(conn net.Conn, statusCode int, content string) {
-	resContent := []interface{}{[]byte(content)}
-	res := clientMessageAPI{Type: statusCode, Content: resContent}
-	resJSON, _ := json.Marshal(res)
-	conn.Write([]byte(resJSON))
 }

@@ -1,2 +1,2 @@
 go mod tidy
-go build *.go -o server
+go build -o server *.go
