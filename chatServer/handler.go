@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net"
@@ -30,11 +31,22 @@ type clientMessageAPI struct {
 }
 
 func handleClient(conn net.Conn) {
-	var buf [1024]byte
+	/*
+	 * use bytes.Buffer to store message instead of []byte
+	 */
+	buf := bytes.Buffer{}
+	// buf := bytes.NewBuffer(nil)
+	// var buf [1024]byte
+	/*
+	 * expand buffer size to 1024
+	 */
+	buf.Grow(1024)
 	for {
-		n, err := conn.Read(buf[0:])
+		n, err := buf.ReadFrom(conn)
+		// n, err := conn.Read(buf.Bytes())
+		// n, err := conn.Read(buf[0:])
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 		} else {
 			if n == 0 {
 				continue
@@ -44,10 +56,15 @@ func handleClient(conn net.Conn) {
 				 * but json.dumps will use <string> with " surrounded
 				 * so we won't deliver " in buf to handleMessage
 				 */
-				go handleMessage(conn, buf[1:n-1])
+				go handleMessage(conn, buf.Bytes()[1:n-1])
+				// go handleMessage(conn, buf[1:n-1])
 				// go handleMessage(conn, buf[0:n])
 			}
 		}
+		/*
+		 * flush buffer to empty after each message
+		 */
+		buf.Reset()
 	}
 }
 
