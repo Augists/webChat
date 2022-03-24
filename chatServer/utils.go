@@ -22,7 +22,7 @@ func GetMD5(str string) string {
 	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
-func RemoveSlice(slice []userID, i userID) []userID {
+func RemoveSlice(slice []string, i string) []string {
 	for j, v := range slice {
 		if v == i {
 			slice = append(slice[:j], slice[j+1:]...)
@@ -33,8 +33,9 @@ func RemoveSlice(slice []userID, i userID) []userID {
 }
 
 func Response(conn net.Conn, statusCode int, content string) {
-	resContent := []interface{}{[]byte(content)}
+	resContent := []interface{}{content}
 	res := clientMessageAPI{Type: statusCode, Content: resContent}
 	resJSON, _ := json.Marshal(res)
-	conn.Write([]byte(resJSON))
+	conn.Write(resJSON)
+	fmt.Println("Response:", string(resJSON))
 }
