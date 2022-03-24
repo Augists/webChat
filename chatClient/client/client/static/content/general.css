@@ -1,0 +1,34 @@
+body {
+    padding: 0;
+    margin: 0;
+    background-image: url('../img/bg_beehive.png');
+}
+
+main {
+    margin: 40px 8%;
+}
+
+#nav {
+    box-shadow: 0 .25rem .5rem rgba(0,0,0,.2);
+}
+
+.nav-item {
+    font-family: 'Arial Normal', 'Arial', sans-serif;
+}
+
+.text-small {
+    font-size: 13px;
+}
+
+.nav-x {
+    display: block;
+    padding: .5rem 1rem;
+    color: #000000;
+    text-decoration: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out
+}
+
+.nav-x:hover {
+    color: #5151E5;
+
+}

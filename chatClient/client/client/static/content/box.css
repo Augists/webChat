@@ -1,0 +1,33 @@
+#successcard {
+    position: relative;
+    margin: 8% auto;
+    width: 500px;
+    max-width: 90%;
+}
+
+#success1 {
+    position: relative;
+    margin-top: 15%;
+}
+
+#successimg {
+    position: relative;
+    vertical-align: middle;
+    width: 50px;
+}
+
+#successtext {
+    position: relative;
+    display: inline-block;
+    height: 50px;
+}
+
+#success2 {
+    position: relative;
+    margin-top: 12%;
+    margin-bottom: 15%;
+}
+
+#successbtn {
+    border: none;
+}

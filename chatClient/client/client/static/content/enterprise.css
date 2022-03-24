@@ -1,0 +1,70 @@
+#back {
+    color: rgb(32, 156, 221);
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+h1 {
+    text-align: center;
+}
+
+#sidebar {
+    width: 200px;
+}
+
+.side-top, .side-item {
+    display: flex;
+    padding: 10px;
+    border: 1px solid white;
+    background-color: rgb(15, 182, 240);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.side-top > div {
+    margin: 0 auto;
+}
+
+.side-item > div {
+    margin-right: auto;
+}
+
+.side-item > span:hover {
+    cursor: pointer;
+}
+
+.side-dropdown > * {
+    padding: 10px;
+    color: #333;
+    font-size: 12px;
+    background-color: rgb(180, 230, 247);
+    border: 1px solid white;
+    text-align: center;
+    transition: all ease 0.3s;
+}
+
+.side-dropdown > *:hover {
+    color: rgb(15, 182, 240);
+    background-color: white;
+    border-left: 3px solid rgb(15, 182, 240);
+}
+
+#nav-tab .nav-link {
+    margin-right: 5px;
+    color: white;
+    background-color: rgb(15, 182, 240);
+}
+
+#nav-tab .active {
+    color: rgb(15, 182, 240);
+    background-color: white;
+}
+
+@media only screen and (max-width: 768px) {
+    #sidebar {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

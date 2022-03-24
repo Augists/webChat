@@ -1,0 +1,115 @@
+main img {
+    display: block;
+}
+
+#banner {
+    background-image: url("../img/index/u3.png");
+    background-size: cover;
+}
+
+#banner > div {
+    padding: 150px 10%;
+}
+
+#banner > div > p {
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+#banner > div button {
+    background-color: white;
+}
+
+#banner > div button:hover {
+    color: white;
+    background-color: rgb(87, 137, 153);
+}
+
+section {
+    padding: 50px 100px;
+    color: #515151;
+}
+
+section:first-of-type {
+    background-color: rgb(243, 251, 254);
+}
+
+section h1, section h2 {
+    text-align: center;
+    font-weight: bold;
+}
+
+section h1 {
+    font-size: 28px;
+}
+
+section h2 {
+    color: rgb(215, 215, 215);
+    font-size: 16px;
+}
+
+section h3 {
+    font-size: 22px;
+}
+
+/*section h3:after {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    bottom: 0;*/
+/*    left: 0;*/
+/*    display: block;*/
+/*    width: 50%;*/
+/*    height: 10px;*/
+/*    background-color: blue;*/
+/*}*/
+
+section .text {
+    margin: auto 0;
+}
+
+section .text p {
+    font-size: 16px;
+    line-height: 28px;
+}
+
+.appli {
+    padding: 20px;
+    width: 25%;
+    border-radius: 10px;
+    text-align: center;
+    background-color: rgb(242, 251, 254);
+}
+
+.appli img {
+    width: 100%;
+}
+
+.appli p {
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    #banner > div {
+        left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    section {
+        padding: 50px 50px;
+    }
+
+    section img {
+        width: 100%;
+    }
+
+    .text {
+        order: 2;
+    }
+
+    .appli {
+        width: 100%;
+        margin: 20px 0;
+    }
+}

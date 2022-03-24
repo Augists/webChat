@@ -1,0 +1,50 @@
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color:#ffffff ">
+    <div class="container-fluid">
+        <a class="navbar-brand pe-5 ps-3" href="#">
+            <img class="" src="img/logo.jpg" width="150px">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+                <li class="nav-item px-3">
+                    <a aria-current="page" class="nav-x px-0" href="/">首页</a>
+                </li>
+                <li class="nav-item px-3">
+                    <a class="nav-x px-0   " href="search">服务大厅</a>
+                </li>
+                <li class="nav-item px-3">
+                    <a class="nav-x px-0   " href="#">
+                        关于我们
+                    </a>
+                </li>
+            </ul>
+            <ul th:if="${session.loginUser eq null}" class="navbar-nav  mb-2 mb-lg-0 justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-x pe-0 ps-3" href="register">注册</a>
+                </li>
+                <li class="nav-item d-none d-lg-block">
+                    <a class="nav-x px-2" href="#">|</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-x d-none d-lg-block  ps-0 pe-2" href="login">
+                        登录
+                    </a>
+                    <a class="nav-x d-lg-none  px-3" href="login">
+                        登录
+                    </a>
+                </li>
+            </ul>
+            <ul th:if="${session.loginUser ne null}" class="navbar-nav  mb-2 mb-lg-0 justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-x pe-0 ps-3" th:href="'my_account?name=' + ${session.loginUser}">
+                        <font><p th:text="${session.loginUser}+的个人空间"></p></font>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

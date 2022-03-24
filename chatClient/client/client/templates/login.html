@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/content/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/content/general.css" rel="stylesheet">
+    <script src="../static/scripts/bootstrap.bundle.min.js"></script>
+    <script src="../static/scripts/jquery.min.js"></script>
+    <script src="../static/scripts/general.js"></script>
+    <title>登录</title>
+    <style>
+        body {
+            background-image: none;
+        }
+
+        main {
+            background-image: url("../static/img/bg_login.jpg");
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            padding: 100px 0;
+        }
+
+        #login-form {
+            width: 400px;
+            max-width: 100%;
+            margin: 0 0 0 auto;
+        }
+
+        #toRegister {
+            float: right;
+        }
+
+    </style>
+</head>
+<body>
+<div id="nav"></div>
+<main>
+    <!-- 登录框 -->
+    <form action="/login_data" id="login-form" class="p-4 pt-5 bg-white border rounded-3">
+        <!-- 登陆表单 -->
+        <div class="form-floating mb-2">
+            <input type="text" class="form-control" id="username" placeholder="text" name="username">
+            <label for="username">请输入用户名/会员名</label>
+        </div>
+        <div class="form-floating mb-2">
+            <input type="password" class="form-control" id="password" maxlength="16"
+                   placeholder="Password" name="password">
+            <label for="password">请输入密码</label>
+        </div>
+        <div class="mb-3 form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+            <label class="form-check-label" for="remember">
+                记住密码
+            </label>
+        </div>
+        <br/>
+        <!-- 登录按键 -->
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg w-100" type="submit">登录</button>
+        </div>
+        <p>{{message}}</p>
+        <br>
+        <div class="mb-1">
+            <a id="searchPwd" href="#">忘记密码</a>
+            <a id="toRegister" href="register">还没有账号？立即注册</a>
+        </div>
+    </form>
+</main>
+<!--<img id="u42_img" class="mx-auto d-block" src="img/bg_login.jpg"/>-->
+<!-- 登录框 -->
+<div id="footer"></div>
+</body>
+</html>
