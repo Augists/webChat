@@ -10,8 +10,8 @@ import pymysql
 import socket
 import json
 
-# HOST = "20.24.46.99"
-HOST = "localhost"
+HOST = "20.24.46.99"
+#HOST = "localhost"
 PORT = 1201
 
 
@@ -58,12 +58,12 @@ def login_data():
     }
     msg = str(msg)
     print(msg)
-    s.send(str.encode(json.dumps("{'type': 0, 'content': [{'id': 'abc', 'password': '123'}]}")))
+    s.send(str.encode(json.dumps(msg)))
     while True:
         print("waiting....")
         data = s.recv(512)
-        if not data:
-            break
-    print(data)
-    message = "登录"
+        break
+    data = bytes.decode(data)
+    data = eval(data)
+    message = data["content"]
     return render_template('index.html',message = message)
