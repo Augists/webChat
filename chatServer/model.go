@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"time"
@@ -67,22 +68,23 @@ func InitDB() {
 	}
 }
 
-func (s *Group) SetAdmin(id string) error {
-	if has, _ := DBengine.Exist(&Group{
-		GroupID:  s.GroupID,
-		UserList: []string{id},
-	}); has {
-		s.AdminList = append(s.AdminList, id)
-		RemoveSlice(s.UserList, id)
-		DBengine.Update(&Group{}, s)
-		// e.Table(&Group{}).Update(s)
+func (u *User) Login() (bool, error) {
+	// log.Print(*u)
+	// has, err := DBengine.Where("i_d = ?", e.ID).Get(&user)
+	if u.CheckExist() {
+		if u.Password == GetMD5(u.Password+u.Salt) {
+			return true, nil
+		} else {
+			return false, errors.New("password is wrong")
+		}
+	} else {
+		return false, errors.New("user does not exist")
 	}
-	return nil
 }
 
 func (u *User) CheckExist() bool {
-	log.Print(*u)
-	log.Print(u)
+	// log.Print(*u)
+	// log.Print(u)
 	has, _ := DBengine.Exist(u)
 	return has
 }
@@ -101,26 +103,6 @@ func (u *User) SetPassword(pwd string) error {
 	return err
 }
 
-// false, err - user not found
-// false, nil - password not match
-// true, nil  - login success
-func (u *User) Login() (bool, error) {
-	log.Print("login...")
-	log.Print(*u)
-	// has, err := DBengine.Where("i_d = ?", e.ID).Get(&user)
-	has := u.CheckExist()
-	// log.Print(has, err)
-	// if err != nil {
-	// 	return false, err
-	// }
-	if has {
-		if u.Password == GetMD5(u.Password+u.Salt) {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func (e *User) PushMessage(msg string) error {
 	_, err := DBengine.Insert(&Message{
 		SenderID:   e.ID,
@@ -130,4 +112,17 @@ func (e *User) PushMessage(msg string) error {
 		Modified:   time.Now(),
 	})
 	return err
+}
+
+func (s *Group) SetAdmin(id string) error {
+	if has, _ := DBengine.Exist(&Group{
+		GroupID:  s.GroupID,
+		UserList: []string{id},
+	}); has {
+		s.AdminList = append(s.AdminList, id)
+		RemoveSlice(s.UserList, id)
+		DBengine.Update(&Group{}, s)
+		// e.Table(&Group{}).Update(s)
+	}
+	return nil
 }
