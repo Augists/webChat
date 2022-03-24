@@ -34,7 +34,8 @@ func handleClient(conn net.Conn) {
 			if n == 0 {
 				continue
 			} else {
-				go handleMessage(conn, buf[0:n])
+				// go handleMessage(conn, buf[0:n])
+				go handleMessage(conn, buf[1:n-1])
 			}
 		}
 		// _, err2 := conn.Write(buf[0:n])
@@ -45,18 +46,32 @@ func handleClient(conn net.Conn) {
 }
 
 func handleMessage(conn net.Conn, buf []byte) {
+	// testUser := User{ID: 123, Password: "1234"}
+	// testMsg := clientMessageAPI{Type: 0, Content: []interface{}{testUser}}
+	// test, _ := json.Marshal(testMsg)
+	// fmt.Println(string(test))
+
+	// replace ' with " in buf
+	for i, v := range buf {
+		if v == '\'' {
+			buf[i] = '"'
+		}
+	}
+	// fmt.Println(string(buf))
 	var msg clientMessageAPI
 	err := json.Unmarshal(buf, &msg)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print(msg.Content)
+	log.Print(msg.Content[0])
 	switch msg.Type {
 	case LOGIN:
-		handleLogin(conn, msg.Content[0].([]byte))
+		handleLogin(conn, msg.Content[0].(map[string]interface{}))
 	case LOGOUT:
-		handleLogout(conn, msg.Content[0].([]byte))
+		handleLogout(conn, msg.Content[0].(map[string]interface{}))
 	case REGISTER:
-		handleRegister(conn, msg.Content[0].([]byte))
+		handleRegister(conn, msg.Content[0].(map[string]interface{}))
 	case CHATMESSAGE:
 		handleChatMessage(conn, msg.Content)
 	case GROUPMESSAGE:
@@ -64,13 +79,13 @@ func handleMessage(conn net.Conn, buf []byte) {
 	}
 }
 
-func handleLogin(conn net.Conn, content []byte) {
-	msg := User{}
+func handleLogin(conn net.Conn, content map[string]interface{}) {
+	log.Print("handleLogin...")
+	msg := User{ID: content["id"].(userID), Password: content["password"].(string)}
 
 	var resMsg string
 	var statusCode int
 
-	json.Unmarshal(content, &msg)
 	if ok, err := msg.Login(); ok {
 		// store userID and IP in map
 		userIP[msg.ID] = conn.RemoteAddr().String()
@@ -95,9 +110,9 @@ func handleLogin(conn net.Conn, content []byte) {
 	Response(conn, statusCode, resMsg)
 }
 
-func handleLogout(conn net.Conn, content []byte) {
-	msg := User{}
-	json.Unmarshal(content, &msg)
+func handleLogout(conn net.Conn, content map[string]interface{}) {
+	log.Print("handleLogout...")
+	msg := User{ID: content["id"].(userID)}
 	if _, ok := userIP[msg.ID]; ok {
 		delete(userIP, msg.ID)
 
@@ -111,9 +126,8 @@ func handleLogout(conn net.Conn, content []byte) {
 	}
 }
 
-func handleRegister(conn net.Conn, content []byte) {
-	msg := User{}
-	json.Unmarshal(content, &msg)
+func handleRegister(conn net.Conn, content map[string]interface{}) {
+	msg := User{ID: content["id"].(userID), Name: content["name"].(string), Password: content["password"].(string)}
 	if msg.CheckExist() {
 		Response(conn, ERROR, "User Already Exist")
 	} else {

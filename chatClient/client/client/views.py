@@ -8,8 +8,10 @@ from client import app
 from flask import request,jsonify
 import pymysql
 import socket
+import json
 
-HOST = "20.24.46.99"
+# HOST = "20.24.46.99"
+HOST = "localhost"
 PORT = 1201
 
 
@@ -56,7 +58,7 @@ def login_data():
     }
     msg = str(msg)
     print(msg)
-    s.send(b"{'type': 0, 'content': [{'id': 'abc', 'password': '123'}]}")
+    s.send(str.encode(json.dumps("{'type': 0, 'content': [{'id': 'abc', 'password': '123'}]}")))
     while True:
         print("waiting....")
         data = s.recv(512)

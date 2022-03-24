@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	go InitDB()
+	// go InitDB()
 
 	// socket server
 	service := ":1201"
