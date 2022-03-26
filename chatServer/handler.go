@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net"
@@ -30,11 +31,22 @@ type clientMessageAPI struct {
 }
 
 func handleClient(conn net.Conn) {
-	var buf [1024]byte
+	/*
+	 * use bytes.Buffer to store message instead of []byte
+	 */
+	buf := bytes.Buffer{}
+	// buf := bytes.NewBuffer(nil)
+	// var buf [1024]byte
+	/*
+	 * expand buffer size to 1024
+	 */
+	buf.Grow(1024)
 	for {
-		n, err := conn.Read(buf[0:])
+		n, err := buf.ReadFrom(conn)
+		// n, err := conn.Read(buf.Bytes())
+		// n, err := conn.Read(buf[0:])
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 		} else {
 			if n == 0 {
 				continue
@@ -44,10 +56,15 @@ func handleClient(conn net.Conn) {
 				 * but json.dumps will use <string> with " surrounded
 				 * so we won't deliver " in buf to handleMessage
 				 */
-				go handleMessage(conn, buf[1:n-1])
+				go handleMessage(conn, buf.Bytes()[1:n-1])
+				// go handleMessage(conn, buf[1:n-1])
 				// go handleMessage(conn, buf[0:n])
 			}
 		}
+		/*
+		 * flush buffer to empty after each message
+		 */
+		buf.Reset()
 	}
 }
 
@@ -95,31 +112,27 @@ func handleLogin(conn net.Conn, content map[string]interface{}) {
 	msg := User{ID: content["id"].(string), Password: content["password"].(string)}
 	log.Print(msg)
 
-	var resMsg string
-	var statusCode int
-
 	if ok, err := msg.Login(); ok {
-		// store string and IP in map
+		/*
+		 * store string and IP in map
+		 */
 		userIP[msg.ID] = conn.RemoteAddr().String()
 		log.Println("user ID: ", msg.ID, "\tIP: ", userIP[msg.ID])
 
-		resMsg = "Login Success"
-		statusCode = LOGIN
+		resMsg := "Login Success"
+		log.Print(resMsg)
+		Response(conn, LOGIN, resMsg)
 
-		// push messages to client if any
-		// TODO
+		/*
+		 * push messages to client if any
+		 * TODO
+		 */
 
-	} else if err != nil {
-		resMsg = "User Not Found"
-		statusCode = ERROR
-		log.Print(err)
 	} else {
-		resMsg = "Password Not Match"
-		statusCode = ERROR
-		log.Print(err)
+		resMsg := err.Error()
+		log.Print(resMsg)
+		Response(conn, ERROR, resMsg)
 	}
-
-	Response(conn, statusCode, resMsg)
 }
 
 func handleLogout(conn net.Conn, content map[string]interface{}) {
@@ -129,25 +142,40 @@ func handleLogout(conn net.Conn, content map[string]interface{}) {
 		delete(userIP, msg.ID)
 
 		log.Println("string: ", msg.ID, "\tIP: ", userIP[msg.ID])
-		Response(conn, LOGOUT, "Logout Success")
+		resMsg := "Logout Success"
+		Response(conn, LOGOUT, resMsg)
+		log.Print("Logout Success")
 
-		// close connection
+		/*
+		 * close connection and goroutine
+		 */
 		conn.Close()
+		return
 	} else {
-		Response(conn, ERROR, "User Not Found")
+		resMsg := "User Not Found"
+		Response(conn, ERROR, resMsg)
+		log.Print(resMsg)
 	}
 }
 
 func handleRegister(conn net.Conn, content map[string]interface{}) {
-	// msg := User{ID: content["id"].(string), Name: content["name"].(string), Password: content["password"].(string)}
-	msg := User{ID: content["id"].(string), Password: content["password"].(string)}
+	log.Print("handleRegister...")
+	msg := User{ID: content["id"].(string), Name: content["name"].(string), Password: content["password"].(string)}
+	// msg := User{ID: content["id"].(string), Password: content["password"].(string)}
 	if msg.CheckExist() {
-		Response(conn, ERROR, "User Already Exist")
+		resMsg := "User Already Exist"
+		log.Print(resMsg)
+		Response(conn, ERROR, resMsg)
 	} else {
 		if err := msg.Register(); err != nil {
-			Response(conn, ERROR, "Register Fail")
+			resMsg := "Register Failed"
+			log.Print(resMsg)
+			log.Print(err)
+			Response(conn, ERROR, resMsg)
 		} else {
-			Response(conn, REGISTER, "Register Success")
+			resMsg := "Register Success"
+			log.Print(resMsg)
+			Response(conn, REGISTER, resMsg)
 		}
 	}
 }
@@ -158,8 +186,10 @@ func handleChatMessage(conn net.Conn, content []interface{}) {
 		json.Unmarshal(v.([]byte), &msg[i])
 		if _, ok := userIP[msg[i].SenderID]; ok {
 			// msg[i].Store()
-			// try to push message to client
-			// TODO
+			/*
+			 * try to push message to client
+			 * TODO
+			 */
 
 		} else {
 			Response(conn, ERROR, "Sender Not Found")
@@ -173,8 +203,10 @@ func handleGroupMessage(conn net.Conn, content []interface{}) {
 		json.Unmarshal(v.([]byte), &msg[i])
 		if _, ok := userIP[msg[i].SenderID]; ok {
 			// msg[i].Store()
-			// try to push message to client
-			//TODO
+			/*
+			 * try to push message to client
+			 * TODO
+			 */
 
 		} else {
 			Response(conn, ERROR, "Sender Not Found")
