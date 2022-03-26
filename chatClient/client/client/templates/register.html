@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/content/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/content/general.css" rel="stylesheet">
+    <script src="../static/scripts/bootstrap.bundle.min.js"></script>
+    <script src="../static/scripts/jquery.min.js"></script>
+    <script src="../static/scripts/general.js"></script>
+    <title>注册</title>
+    <style>
+        .base {
+            position: relative;
+            width: 100%;
+        }
+
+        .base_bg {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .welcome {
+            width: 100%;
+            padding: 0 5%;
+            margin: 0 auto;
+            text-align: center;
+            align-content: center;
+        }
+
+        .welcome_text {
+            position: relative;
+            margin-top: 5%;
+        }
+
+        .register_card {
+            position: relative;
+            margin: 3% auto;
+            text-align: center;
+            width: 600px;
+            max-width: 100%;
+        }
+
+        #username {
+            margin-top: 8%;
+        }
+
+        .register_input {
+            position: relative;
+            width: 75%;
+            height: 10%;
+            margin: 0.5rem auto;
+        }
+
+        .register_button {
+            margin: 1rem auto 0.5rem;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+<div id="nav"></div>
+<div class="base">
+    <div class="base_bg" id="basebg">
+        <div class="welcome">
+            <div class="welcome_text ">
+                <h1>欢迎使用聊天室</h1>
+            </div>
+            <div class="register_card card text-center">
+                <form action="/register_data" class="register_form text-center"  method="post">
+                    <!-- 输入框组 -->
+                    <div class="register_input form-floating">
+                        <input type="text" class="form-control" placeholder="text" id="username" name="username">
+                        <label for="username">请输入用户名</label>
+                    </div>
+                    <div class="register_input form-floating">
+                        <input type="tel" class="form-control" placeholder="text" id="mobile" name="nickname">
+                        <label for="mobile">请输入昵称</label>
+                    </div>
+                    <div class="register_input form-floating">
+                        <input type="password" class="form-control" maxlength="16" placeholder="password" id="password" name="password">
+                        <label for="password">请设置6-16位密码</label>
+                    </div>
+                    <!-- <div class="register_input form-floating">
+                        <input type="password" class="form-control" maxlength="16" placeholder="password" id="confirm" name="confirm">
+                        <label for="confirm">确认密码</label>
+                    </div> -->
+                    <div id="registerbt" class="register_button">
+                        <button class="btn btn-lg w-25 btn-primary" type="submit">注册</button>
+                    </div>
+                </form>
+                <div id="tologin" class="login_link">
+                    <p class="text-black">已经有帐号？<a href="login.html">登录</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer"></div>
+</body>
+</html>
