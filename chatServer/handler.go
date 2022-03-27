@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"log"
 	"net"
+	"strconv"
+	"sync"
 )
 
 var (
 	userIP map[string]string
+	wg     sync.WaitGroup
 )
 
 /*
@@ -109,15 +112,15 @@ func handleMessage(conn net.Conn, buf []byte) {
 
 func handleLogin(conn net.Conn, content map[string]interface{}) {
 	log.Print("handleLogin...")
-	msg := User{ID: content["id"].(string), Password: content["password"].(string)}
-	log.Print(msg)
+	u := User{ID: content["id"].(string), Password: content["password"].(string)}
+	log.Print(u)
 
-	if ok, err := msg.Login(); ok {
+	if ok, err := u.Login(); ok {
 		/*
 		 * store string and IP in map
 		 */
-		userIP[msg.ID] = conn.RemoteAddr().String()
-		log.Println("user ID: ", msg.ID, "\tIP: ", userIP[msg.ID])
+		userIP[u.ID] = conn.RemoteAddr().String()
+		log.Println("user ID: ", u.ID, "\tIP: ", userIP[u.ID])
 
 		resMsg := "Login Success"
 		log.Print(resMsg)
@@ -125,9 +128,14 @@ func handleLogin(conn net.Conn, content map[string]interface{}) {
 
 		/*
 		 * push messages to client if any
-		 * TODO
 		 */
-
+		wg.Add(2)
+		go u.PullMessage(conn)
+		go u.PullGroupMessage(conn)
+		/*
+		 * waitGroup until pull complete
+		 */
+		wg.Wait()
 	} else {
 		resMsg := err.Error()
 		log.Print(resMsg)
@@ -182,34 +190,65 @@ func handleRegister(conn net.Conn, content map[string]interface{}) {
 
 func handleChatMessage(conn net.Conn, content []interface{}) {
 	msg := []Message{}
+	var onlineCount int = 0
+	var offlineCount int = 0
 	for i, v := range content {
 		json.Unmarshal(v.([]byte), &msg[i])
-		if _, ok := userIP[msg[i].SenderID]; ok {
-			// msg[i].Store()
+		if _, ok := userIP[msg[i].ReceiverID]; ok {
+			onlineCount++
 			/*
+			 * receiver online
 			 * try to push message to client
-			 * TODO
 			 */
-
+			clientConn, err := net.Dial("tcp", userIP[msg[i].SenderID])
+			if err != nil {
+				log.Print(err)
+			} else {
+				clientConn.Write(v.([]byte))
+				clientConn.Close()
+			}
 		} else {
-			Response(conn, ERROR, "Sender Not Found")
+			/*
+			 * receiver offline
+			 * store in database
+			 */
+			offlineCount++
+			msg[i].Store()
 		}
 	}
+	Response(conn, CHATMESSAGE, "Online User:"+strconv.Itoa(onlineCount)+",Offline User:"+strconv.Itoa(offlineCount))
 }
 
 func handleGroupMessage(conn net.Conn, content []interface{}) {
-	msg := []Message{}
+	msg := []GroupMessage{}
 	for i, v := range content {
 		json.Unmarshal(v.([]byte), &msg[i])
-		if _, ok := userIP[msg[i].SenderID]; ok {
-			// msg[i].Store()
-			/*
-			 * try to push message to client
-			 * TODO
-			 */
-
-		} else {
-			Response(conn, ERROR, "Sender Not Found")
+		/*
+		 * try to push message to client
+		 */
+		gid := msg[i].GroupID
+		groupUserList := GetGroupUserList(gid)
+		for _, userID := range groupUserList {
+			if _, ok := userIP[userID]; ok {
+				/*
+				 * receiver online
+				 * try to push message to client
+				 */
+				clientConn, err := net.Dial("tcp", userIP[userID])
+				if err != nil {
+					log.Print(err)
+				} else {
+					clientConn.Write(v.([]byte))
+					clientConn.Close()
+				}
+			} else {
+				/*
+				 * receiver offline
+				 * store in database
+				 */
+				msg[i].Store()
+			}
 		}
 	}
+	Response(conn, GROUPMESSAGE, "")
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"strings"
 )
 
 func GetRandomString(length int) string {
@@ -38,4 +39,16 @@ func Response(conn net.Conn, statusCode int, content string) {
 	resJSON, _ := json.Marshal(res)
 	conn.Write(resJSON)
 	fmt.Println("Response:", string(resJSON))
+}
+
+func ListToString(list []string) string {
+	var str string
+	for _, v := range list {
+		str += v + ","
+	}
+	return str[:len(str)-1]
+}
+
+func StringToList(str string) []string {
+	return strings.Split(str, ",")
 }
