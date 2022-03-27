@@ -25,45 +25,91 @@ PORT = 1201
 #     data = cur.fetchall()
 #     db.close()
 #     return data
+class Message:
+    def __init__(self,username,create_time,content):
+        self.username=username
+        self.create_time=create_time
+        self.content =content
 
 
-
-
+#主界面
 @app.route('/')
 def home():
     """Renders the home page."""
     return render_template('index.html')
 
+#登录界面
 @app.route('/login')
 def login():
     """login page."""
     return render_template('login.html')
 
+#登录数据处理
 @app.route('/login_data',methods=['GET', 'POST'])
 def login_data():
     """login data"""
     username =request.args.get("username")
     password =request.args.get("password")
-    #print(username)
-    #print(password)
-    #print(TruePassword)
-    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((HOST, PORT))
+    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)#创建socket
+    s.connect((HOST, PORT))#连接服务器端
     msg={
-  "type": 0,
-  "content": [{
-    "id": username,
-    "password": password
-        }]
+    "type": 0,
+    "content": [{
+            "id": username,
+            "password": password
+             }]
     }
     msg = str(msg)
-    print(msg)
-    s.send(str.encode(json.dumps(msg)))
+    s.send(str.encode(json.dumps(msg)))#发送请求
     while True:
         print("waiting....")
-        data = s.recv(512)
+        data = s.recv(512)#接受请求
         break
     data = bytes.decode(data)
-    data = eval(data)
-    message = data["content"]
+    data = eval(data)#转为字典
+    message = data["content"]#获取消息
     return render_template('index.html',message = message)
+
+#注册数据处理   
+@app.route('/register_data',methods=['GET', 'POST'])
+def register_data():
+    """register data"""
+    username =request.args.get("username")
+    nickname = request.args.get("nickname")
+    password =request.args.get("password")
+    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)#创建socket
+    s.connect((HOST, PORT))#连接服务器端
+    msg={
+        "type": 2,
+        "content": [{
+                "id": username,
+                 "name":nickname,
+                "password": password
+                }]
+          }
+    msg = str(msg)
+    s.send(str.encode(json.dumps(msg)))#发送请求
+    while True:
+        print("waiting....")
+        data = s.recv(512)#接受请求
+        break
+    data = bytes.decode(data)
+    data = eval(data)#转为字典
+    message = data["content"]#获取消息
+    #if message =="" 注册成功消息
+    #return render_template('reg_success',message = message)
+    return render_template('register.html',message = message)#注册失败返回
+#返回注册界面
+@app.route('/register')
+def register():
+    """register page."""
+    return render_template('register.html')
+
+#聊天消息测试
+@app.route('/chat')
+def chat():
+    """chat page."""
+    message1  = Message("Niko","21:09","Hello")
+    message2  = Message("Simple","21:19","Hello,too")
+    message_list=[message1,message2]
+    return render_template('chat.html',message_list=message_list)

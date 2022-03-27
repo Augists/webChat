@@ -1,0 +1,18 @@
+    <!--消息-->
+    <div id="message_container" style="margin-bottom: 95px" class="container bg-light mt-2 ">
+
+        {% for message in message_list %}
+            <div class="msg-box mt-3">
+                <div class="picture">
+                    <img class="pop-card" data-position="right center" data-offset="-40">
+                </div>
+                <div class="msg">
+                    <span class="nickname">{{ message.username }}</span>
+                    <small class="timestamp">{{ message.create_time }}</small>
+                    <span class="message-body">{{ message.content }}</span>
+                </div>
+            </div>
+        {% endfor %}
+
+
+    </div>
