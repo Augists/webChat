@@ -4,11 +4,16 @@ Routes and views for the flask application.
 
 from datetime import datetime
 from flask import render_template
-from client import app
+from client import app,socketio
 from flask import request,jsonify
 import pymysql
 import socket
 import json
+import threading
+from flask_socketio import emit
+from flask_socketio import SocketIO
+from time import sleep
+import jinja2
 
 HOST = "20.24.46.99"
 #HOST = "localhost"
@@ -119,3 +124,91 @@ def chat():
     message2  = Message("Simple","21:19","Hello,too")
     message_list=[message1,message2]
     return render_template('chat.html',message_list=message_list)
+
+
+
+@socketio.on('new_message')
+def new_message(content):
+    print(content)
+    message = Message("niko","20:45",content['content'])
+    emit('new_message',{'message_html':render_template('message.html',message=message)})
+
+
+
+#class serverThread(threading.Thread):
+#    def __init__(self, threadID, name):
+#        threading.Thread.__init__(self)
+#        self.threadID = threadID
+#        self.name = name
+#    @socketio.on('start_listen')
+#    def run(self):
+#        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#            s.bind(('0.0.0.0', 5556))
+#            s.listen()
+#            while True:
+#                print("Waiting")
+#                conn, addr = s.accept()
+#                with conn:
+#                    print('Connected by', addr)
+#                    while True:
+#                        data = conn.recv(1024)
+#                        break
+#                    print(data)
+#                    data = bytes.decode(data[1:len(data)-1])
+#                    data = eval(data)#转为字典
+#                    print(data)
+#                    msg = data["content"][0]["text"]
+#                    n =data["content"][0]["name"]
+#                    t=data["content"][0]["creat_time"]
+#                    message = Message(n,t,msg)
+#                    print(message)
+#                    emit('new_message2',{'message_html':render_template('message.html',message=message)})
+
+
+@socketio.on('start_listen')
+def run(content):
+    print(content)
+    #server_thread = serverThread(1, "Thread-1")
+    #server_thread.start()
+    #server_thread.join()
+
+    #thread = threading.Thread(target=run_server, args=())
+    #thread.daemon  = True
+    #thread.start()
+    socketio.start_background_task(target=run_server)
+    
+def run_server():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('0.0.0.0', 5556))
+        s.listen()
+        #while True:
+        print("Waiting")
+        conn, addr = s.accept()
+        with conn:
+            print('Connected by', addr)
+            while True:
+                data = conn.recv(1024)
+                break
+            print(data)
+            data = bytes.decode(data[1:len(data)-1])
+            data = eval(data)#转为字典
+            print(data)
+            msg = data["content"][0]["text"]
+            n =data["content"][0]["name"]
+            t=data["content"][0]["creat_time"]
+            message = Message(n,t,msg)
+            print(message)
+            socketio.emit('new_message',{'message_html':render_without_template('message.html',message=message)})
+
+
+def render_without_template(template_name, **template_vars):
+    """
+    Usage is the same as flask.render_template:
+
+    render_without_request('my_template.html', var1='foo', var2='bar')
+    """
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('client','templates')
+    )
+    template = env.get_template(template_name)
+    return template.render(**template_vars)

@@ -90,16 +90,15 @@
 
 
 
-
-    <script src="../static/scripts/semantic.min.js"></script>
-    <script src="../static/scripts/sock_io.js"></script>
-    <script src="../static/scripts/bootstrap.min.js"></script>
     <script src="../static/scripts/jquery.min.js" ></script>
+    <script src="../static/scripts/semantic.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+    <script src="../static/scripts/bootstrap.min.js"></script>
     <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script>
         var socket = io('/')
         $(function () {
-        console.log(1);
+        socket.emit('start_listen',"start_listen");
         send()
         get()
 
@@ -110,23 +109,25 @@
         console.log("send")
         $('#send_button').click(function () {
          var content = $('#text_area').val().trim();
+         console.log("send message")
+         console.log(content)
          if (content==""){
 
          }else {
-             socket.emit('new_message',content);
+            console.log("emit")
+             socket.emit('new_message',{content});
              $('#text_area').val("")
          }
         })
  }
         function get() {
             console.log("get")
-            socket.on('new_message',function (data) {
+            socket.on('new_message', function (data) {
+                console.log(data)
                 $('#message_container').append(data.message_html);
                 scrollToEnd();
-
             })
         }
-
         function scrollToEnd() {//滚动到底部
             var h = $(document).height() - $(window).height();
             $(document).scrollTop(h);

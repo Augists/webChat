@@ -15,6 +15,7 @@ def run_server():
         s.bind(('localhost', 5556))
         s.listen()
         while True:
+            print("Waiting")
             conn, addr = s.accept()
             with conn:
                 print('Connected by', addr)
