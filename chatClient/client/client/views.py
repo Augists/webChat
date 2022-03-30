@@ -109,6 +109,8 @@ def register():
 @app.route('/chat')
 def chat():
     """chat page."""
+    # get message_list from database
+
     message1  = Message("Niko","21:09","Hello")
     message2  = Message("Simple","21:19","Hello,too")
     message_list=[message1,message2]
