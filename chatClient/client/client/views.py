@@ -37,6 +37,10 @@ class Message:
 def home():
     """Renders the home page."""
     return render_template('index.html')
+@app.route('/index')
+def homepage():
+    """Renders the home page."""
+    return render_template('index.html')
 
 #登录界面
 @app.route('/login')

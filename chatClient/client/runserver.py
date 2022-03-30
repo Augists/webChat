@@ -3,18 +3,12 @@ This script runs the client application using a development server.
 """
 
 from os import environ
-from client import app
-import thread
+from client import app,socketio
+import _thread
 import socket
+from flask_socketio import SocketIO
+import eventlet
 
-if __name__ == '__main__':
-    thread.start_new_thread(run_server, ())
-    HOST = environ.get('SERVER_HOST', 'localhost')
-    try:
-        PORT = int(environ.get('SERVER_PORT', '5555'))
-    except ValueError:
-        PORT = 5555
-    app.run(HOST, PORT)
 
 def run_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -29,3 +23,10 @@ def run_server():
                     if not data:
                         break
                 # data.store()
+
+
+
+
+if __name__ == '__main__':
+    #_thread.start_new_thread(run_server, ())
+    socketio.run(app,host="0.0.0.0")

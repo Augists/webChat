@@ -18,6 +18,7 @@
     <Name>client</Name>
     <RootNamespace>client</RootNamespace>
     <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
+    <WebBrowserPort>5000</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +42,12 @@
     <Folder Include="client\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="client\templates\chat.html" />
+    <Content Include="client\templates\footer.html" />
+    <Content Include="client\templates\login.html" />
+    <Content Include="client\templates\navbar.html" />
+    <Content Include="client\templates\register.html" />
+    <Content Include="client\templates\reg_success.html" />
     <Content Include="requirements.txt" />
     <Content Include="client\static\content\bootstrap.css" />
     <Content Include="client\static\content\bootstrap.min.css" />
@@ -51,23 +58,11 @@
     <Content Include="client\static\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="client\static\scripts\bootstrap.js" />
     <Content Include="client\static\scripts\bootstrap.min.js" />
-    <Content Include="client\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="client\static\scripts\jquery-1.10.2.js" />
-    <Content Include="client\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="client\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="client\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="client\static\scripts\jquery.validate.js" />
-    <Content Include="client\static\scripts\jquery.validate.min.js" />
-    <Content Include="client\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="client\static\scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="client\static\scripts\modernizr-2.6.2.js" />
     <Content Include="client\static\scripts\respond.js" />
     <Content Include="client\static\scripts\respond.min.js" />
     <Content Include="client\static\scripts\_references.js" />
-    <Content Include="client\templates\about.html" />
-    <Content Include="client\templates\contact.html" />
     <Content Include="client\templates\index.html" />
-    <Content Include="client\templates\layout.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
